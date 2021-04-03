@@ -22,7 +22,13 @@ spec:
           containerPort: 5672
         - name: port15672
           containerPort: 15672
-
+        resources:
+          limits:
+            cpu: 8m
+            memory: 1500Mi
+          requests:
+            cpu: 4m
+            memory: 500Mi
 ---
 apiVersion: v1
 kind: Service
@@ -64,6 +70,13 @@ spec:
         image: bart120/yv-database:1
         ports:
         - containerPort: 1433
+        resources:
+          limits:
+            cpu: 250m
+            memory: 2500Mi
+          requests:
+            cpu: 170m
+            memory: 1500Mi
 
 ---
 apiVersion: v1
@@ -101,6 +114,13 @@ spec:
         image: redis
         ports:
         - containerPort: 6379
+        resources:
+          limits:
+            cpu: 8m
+            memory: 1500Mi
+          requests:
+            cpu: 4m
+            memory: 500Mi
 
 ---
 apiVersion: v1
@@ -143,6 +163,23 @@ spec:
           value: "service-user-data:6379"
         ports:
         - containerPort: 80
+        resources:
+          limits:
+            cpu: 6m
+            memory: 1500Mi
+          requests:
+            cpu: 3m
+            memory: 500Mi
+      affinity:
+        podAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            - labelSelector:
+                matchExpressions:
+                  - key: app
+                    operator: In
+                    values:
+                      - user-data-pod
+              topologyKey: kubernetes.io/hostname
 
 ---
 apiVersion: v1
@@ -185,6 +222,23 @@ spec:
           value: "service-rabittmq"
         ports:
         - containerPort: 80
+        resources:
+          limits:
+            cpu: 6m
+            memory: 1500Mi
+          requests:
+            cpu: 3m
+            memory: 500Mi
+      affinity:
+        podAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            - labelSelector:
+                matchExpressions:
+                  - key: app
+                    operator: In
+                    values:
+                      - database-pod
+              topologyKey: kubernetes.io/hostname
 
 ---
 apiVersion: v1
@@ -227,6 +281,23 @@ spec:
           value: "service-rabittmq"
         ports:
         - containerPort: 80
+        resources:
+          limits:
+            cpu: 6m
+            memory: 1500Mi
+          requests:
+            cpu: 3m
+            memory: 500Mi
+      affinity:
+        podAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            - labelSelector:
+                matchExpressions:
+                  - key: app
+                    operator: In
+                    values:
+                      - database-pod
+              topologyKey: kubernetes.io/hostname
 
 ---
 apiVersion: v1
@@ -264,6 +335,24 @@ spec:
         image: bart120/yv-web:1
         ports:
         - containerPort: 80
+        resources:
+          limits:
+            cpu: 6m
+            memory: 2000Mi
+          requests:
+            cpu: 4m
+            memory: 900Mi
+      affinity:
+        podAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            - labelSelector:
+                matchExpressions:
+                  - key: app
+                    operator: In
+                    values:
+                      - api-jobs-pod
+                      - api-applicants-pod
+              topologyKey: kubernetes.io/hostname
 
 ---
 apiVersion: v1
