@@ -22,6 +22,18 @@ spec:
           containerPort: 5672
         - name: port15672
           containerPort: 15672
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 80
+          periodSeconds: 3
+          timeoutSeconds: 1
+        livenessProbe:
+          httpGet:
+            path: /
+            port: 80
+          initialDelaySeconds: 3
+          periodSeconds: 2
         resources:
           limits:
             cpu: 8m
@@ -70,6 +82,18 @@ spec:
         image: bart120/yv-database:1
         ports:
         - containerPort: 1433
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 80
+          periodSeconds: 3
+          timeoutSeconds: 1
+        livenessProbe:
+          httpGet:
+            path: /
+            port: 80
+          initialDelaySeconds: 3
+          periodSeconds: 2
         resources:
           limits:
             cpu: 250m
@@ -114,6 +138,18 @@ spec:
         image: redis
         ports:
         - containerPort: 6379
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 80
+          periodSeconds: 3
+          timeoutSeconds: 1
+        livenessProbe:
+          httpGet:
+            path: /
+            port: 80
+          initialDelaySeconds: 3
+          periodSeconds: 2
         resources:
           limits:
             cpu: 8m
@@ -163,6 +199,18 @@ spec:
           value: "service-user-data:6379"
         ports:
         - containerPort: 80
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 80
+          periodSeconds: 3
+          timeoutSeconds: 1
+        livenessProbe:
+          httpGet:
+            path: /
+            port: 80
+          initialDelaySeconds: 3
+          periodSeconds: 2
         resources:
           limits:
             cpu: 6m
@@ -222,6 +270,18 @@ spec:
           value: "service-rabittmq"
         ports:
         - containerPort: 80
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 80
+          periodSeconds: 3
+          timeoutSeconds: 1
+        livenessProbe:
+          httpGet:
+            path: /
+            port: 80
+          initialDelaySeconds: 3
+          periodSeconds: 2
         resources:
           limits:
             cpu: 6m
@@ -281,6 +341,18 @@ spec:
           value: "service-rabittmq"
         ports:
         - containerPort: 80
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 80
+          periodSeconds: 3
+          timeoutSeconds: 1
+        livenessProbe:
+          httpGet:
+            path: /
+            port: 80
+          initialDelaySeconds: 3
+          periodSeconds: 2
         resources:
           limits:
             cpu: 6m
@@ -335,6 +407,18 @@ spec:
         image: bart120/yv-web:1
         ports:
         - containerPort: 80
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 80
+          periodSeconds: 3
+          timeoutSeconds: 1
+        livenessProbe:
+          httpGet:
+            path: /
+            port: 80
+          initialDelaySeconds: 3
+          periodSeconds: 2
         resources:
           limits:
             cpu: 6m
