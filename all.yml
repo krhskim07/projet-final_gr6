@@ -272,13 +272,13 @@ spec:
         - containerPort: 80
         readinessProbe:
           httpGet:
-            path: /
+            path: /readiness
             port: 80
           periodSeconds: 3
           timeoutSeconds: 1
         livenessProbe:
           httpGet:
-            path: /
+            path: /liveness
             port: 80
           initialDelaySeconds: 3
           periodSeconds: 2

@@ -1,0 +1,522 @@
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: web
+  namespace: finalprojet
+  labels:
+    app: web
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: web
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: web
+    spec:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: disktype
+                operator: In
+                values:
+                - ssd  
+        podAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            - labelSelector:
+                matchExpressions:
+                  - key: app
+                    operator: In
+                    values:
+                      - jobs
+                      - applicants
+              topologyKey: kubernetes.io/hostname
+
+      containers:
+      - image: projetgr6.azurecr.io/web:latest
+        name: web-container
+        ports:
+        - containerPort: 80
+          name: webport
+        readinessProbe:
+          httpGet:
+            path: /readiness
+            port: 80
+          periodSeconds: 3
+          timeoutSeconds: 1
+        livenessProbe:
+          httpGet:
+            path: /liveness
+            port: 80
+          initialDelaySeconds: 3
+          periodSeconds: 2
+        resources:
+          limits:
+            cpu: 6m
+            memory: 2000Mi
+          requests:
+            cpu: 4m
+            memory: 900Mi
+      imagePullSecrets:
+        - name: myregistrykey
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: applicants.api
+  namespace: finalprojet
+  labels:
+    app: applicants
+spec:
+  selector:
+    matchLabels:
+      app: applicants
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: applicants
+    spec:
+      containers:
+      - image: projetgr6.azurecr.io/applicants.api:latest
+        name: applicants-container
+        ports:
+        - containerPort: 80
+          name: applicantsport
+        readinessProbe:
+          httpGet:
+            path: /readiness
+            port: 80
+          periodSeconds: 3
+          timeoutSeconds: 1
+        livenessProbe:
+          httpGet:
+            path: /liveness
+            port: 80
+          initialDelaySeconds: 3
+          periodSeconds: 2
+        env:
+        - name: ConnectionString
+          value: Server=sqldata;User=sa;Password=Pass@word;Database=dotnetgigs.applicants
+        - name: HostRabbitmq
+          value: rabbitmq
+        resources:
+          limits:
+            cpu: 6m
+            memory: 1500Mi
+          requests:
+            cpu: 3m
+            memory: 500Mi
+      imagePullSecrets:
+        - name: myregistrykey
+      affinity:
+        podAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            - labelSelector:
+                matchExpressions:
+                  - key: app
+                    operator: In
+                    values:
+                      - sqldata
+              topologyKey: kubernetes.io/hostname
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: jobs.api
+  namespace: finalprojet
+  labels:
+    app: jobs
+spec:
+  selector:
+    matchLabels:
+      app: jobs
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: jobs
+    spec:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: disktype
+                operator: In
+                values:
+                - ssd 
+        podAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            - labelSelector:
+                matchExpressions:
+                  - key: app
+                    operator: In
+                    values:
+                      - sqldata
+              topologyKey: kubernetes.io/hostname
+      containers:
+      - image: projetgr6.azurecr.io/jobs.api:latest
+        name: jobs-container
+        ports:
+        - containerPort: 80
+          name: jobsport
+        readinessProbe:
+          httpGet:
+            path: /readiness
+            port: 80
+          periodSeconds: 3
+          timeoutSeconds: 1
+        livenessProbe:
+          httpGet:
+            path: /liveness
+            port: 80
+          initialDelaySeconds: 3
+          periodSeconds: 2
+        env:
+        - name: ConnectionString
+          value: Server=Sqldata;User=sa;Password=Pass@word;Database=dotnetgigs.jobs
+        - name: HostRabbitmq
+          value: rabbitmq
+        resources:
+          limits:
+            cpu: 6m
+            memory: 1500Mi
+          requests:
+            cpu: 3m
+            memory: 500Mi
+      imagePullSecrets:
+        - name: myregistrykey
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: identity.api
+  namespace: finalprojet
+  labels:
+    app: identity
+spec:
+  selector:
+    matchLabels:
+      app: identity
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: identity
+    spec:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: disktype
+                operator: In
+                values:
+                - ssd 
+        podAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            - labelSelector:
+                matchExpressions:
+                  - key: app
+                    operator: In
+                    values:
+                      - userdata
+              topologyKey: kubernetes.io/hostname
+      containers:
+      - image: projetgr6.azurecr.io/identity.api:latest
+        name: identity-container
+        ports:
+        - containerPort: 80
+          name: identityport
+        readinessProbe:
+          httpGet:
+            path: /readiness
+            port: 80
+          periodSeconds: 3
+          timeoutSeconds: 1
+        livenessProbe:
+          httpGet:
+            path: /liveness
+            port: 80
+          initialDelaySeconds: 3
+          periodSeconds: 2
+        env:
+        - name: RedisHost
+          value: userdata:6379
+        - name: HostRabbitmq
+          value: rabbitmq
+        resources:
+          limits:
+            cpu: 6m
+            memory: 1500Mi
+          requests:
+            cpu: 3m
+            memory: 500Mi
+      imagePullSecrets:
+        - name: myregistrykey
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sqldata
+  namespace: finalprojet
+  labels:
+    app: sqldata
+spec:
+  selector:
+    matchLabels:
+      app: sqldata
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: sqldata
+    spec:
+      containers:
+      - image: projetgr6.azurecr.io/sql.data:latest
+        name: sqldata-container
+        ports:
+        - containerPort: 1433
+          name: sqldataport
+        readinessProbe:
+          httpGet:
+            path: /readiness
+            port: 80
+          periodSeconds: 3
+          timeoutSeconds: 1
+        livenessProbe:
+          httpGet:
+            path: /liveness
+            port: 80
+          initialDelaySeconds: 3
+          periodSeconds: 2
+        resources:
+          limits:
+            cpu: 250m
+            memory: 2500Mi
+          requests:
+            cpu: 170m
+            memory: 1500Mi
+      imagePullSecrets:
+        - name: myregistrykey
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: userdata
+  namespace: finalprojet
+  labels:
+    app: userdata
+spec:
+  selector:
+    matchLabels:
+      app: userdata
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: userdata
+    spec:
+      containers:
+      - image: projetgr6.azurecr.io/redis:latest
+        name: userdata-container
+        ports:
+        - containerPort: 6379
+          name: userdataport
+        readinessProbe:
+          httpGet:
+            path: /readiness
+            port: 80
+          periodSeconds: 3
+          timeoutSeconds: 1
+        livenessProbe:
+          httpGet:
+            path: /liveness
+            port: 80
+          initialDelaySeconds: 3
+          periodSeconds: 2
+        resources:
+          limits:
+            cpu: 8m
+            memory: 1500Mi
+          requests:
+            cpu: 4m
+            memory: 500Mi
+      imagePullSecrets:
+        - name: myregistrykey
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: rabbitmq
+  namespace: finalprojet
+  labels:
+    app: rabbitmq
+spec:
+  selector:
+    matchLabels:
+      app: rabbitmq
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: rabbitmq
+    spec:
+      containers:
+      - image: projetgr6.azurecr.io/rabbitmq:latest
+        name: rabbitmq-container
+        ports:
+        - containerPort: 15672
+          name: rabbitmqport1
+        - containerPort: 5672
+          name: rabbitmqport2
+        readinessProbe:
+          httpGet:
+            path: /readiness
+            port: 80
+          periodSeconds: 3
+          timeoutSeconds: 1
+        livenessProbe:
+          httpGet:
+            path: /liveness
+            port: 80
+          initialDelaySeconds: 3
+          periodSeconds: 2
+        resources:
+          limits:
+            cpu: 8m
+            memory: 1500Mi
+          requests:
+            cpu: 4m
+            memory: 500Mi
+      imagePullSecrets:
+        - name: myregistrykey
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: rabbitmq
+  namespace: finalprojet
+spec:
+  type: ClusterIP
+  ports:
+  - port: 15672
+    targetPort: 15672
+    port: 5672
+    targetPort: 5672
+  selector:
+    app: rabbitmq   
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: userdata 
+  namespace: finalprojet
+spec:
+  type: ClusterIP
+  ports:
+  - port: 6379
+    targetPort: 6379
+  selector:
+    app: userdata
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: sqldata 
+  namespace: finalprojet
+spec:
+  type: ClusterIP
+  ports:
+  - port: 1433
+    targetPort: 1433
+  selector:
+    app: sqldata
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: web
+  namespace: finalprojet
+spec:
+  type:  ClusterIP
+  ports:
+  - port: 80
+    targetPort: 80
+  selector:
+    app: web
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: applicants
+  namespace: finalprojet 
+spec:
+  type:  ClusterIP
+  ports:
+  - port: 80
+    targetPort: 80
+  selector:
+    app: applicants
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: jobs
+  namespace: finalprojet 
+spec:
+  type:  ClusterIP
+  ports:
+  - port: 80
+    targetPort: 80
+  selector:
+    app: jobs
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: identity
+  namespace: finalprojet
+spec:
+  type:  ClusterIP
+  ports:
+  - port: 80
+    targetPort: 80
+  selector:
+    app: identity
+---
+#Ingress Web
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: ingress
+  namespace: finalprojet
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    nginx.ingress.kubernetes.io/rewrite-target: /
+    nginx.ingress.kubernetes.io/ssl-redirect: "false"
+spec:
+  rules: 
+  - http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: web
+            port:
+              number: 80
+---
