@@ -67,6 +67,19 @@ spec:
       imagePullSecrets:
         - name: myregistrykey
 ---
+apiVersion: v1
+kind: Service
+metadata:
+  name: web
+  namespace: finalprojet
+spec:
+  type:  ClusterIP
+  ports:
+  - port: 80
+    targetPort: 80
+  selector:
+    app: web
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -128,6 +141,21 @@ spec:
                     values:
                       - sqldata
               topologyKey: kubernetes.io/hostname
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: applicants
+  namespace: finalprojet 
+spec:
+  type:  ClusterIP
+  ports:
+  - port: 80
+    targetPort: 80
+  selector:
+    app: applicants
+    
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -199,6 +227,20 @@ spec:
       imagePullSecrets:
         - name: myregistrykey
 ---
+apiVersion: v1
+kind: Service
+metadata:
+  name: jobs
+  namespace: finalprojet 
+spec:
+  type:  ClusterIP
+  ports:
+  - port: 80
+    targetPort: 80
+  selector:
+    app: jobs
+
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -269,6 +311,20 @@ spec:
       imagePullSecrets:
         - name: myregistrykey
 ---
+apiVersion: v1
+kind: Service
+metadata:
+  name: identity
+  namespace: finalprojet
+spec:
+  type:  ClusterIP
+  ports:
+  - port: 80
+    targetPort: 80
+  selector:
+    app: identity
+
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -315,6 +371,21 @@ spec:
             memory: 1500Mi
       imagePullSecrets:
         - name: myregistrykey
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: sqldata 
+  namespace: finalprojet
+spec:
+  type: ClusterIP
+  ports:
+  - port: 1433
+    targetPort: 1433
+  selector:
+    app: sqldata
+
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -362,6 +433,20 @@ spec:
             memory: 500Mi
       imagePullSecrets:
         - name: myregistrykey
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: userdata 
+  namespace: finalprojet
+spec:
+  type: ClusterIP
+  ports:
+  - port: 6379
+    targetPort: 6379
+  selector:
+    app: userdata
+
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -426,84 +511,7 @@ spec:
     targetPort: 5672
   selector:
     app: rabbitmq   
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: userdata 
-  namespace: finalprojet
-spec:
-  type: ClusterIP
-  ports:
-  - port: 6379
-    targetPort: 6379
-  selector:
-    app: userdata
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: sqldata 
-  namespace: finalprojet
-spec:
-  type: ClusterIP
-  ports:
-  - port: 1433
-    targetPort: 1433
-  selector:
-    app: sqldata
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: web
-  namespace: finalprojet
-spec:
-  type:  ClusterIP
-  ports:
-  - port: 80
-    targetPort: 80
-  selector:
-    app: web
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: applicants
-  namespace: finalprojet 
-spec:
-  type:  ClusterIP
-  ports:
-  - port: 80
-    targetPort: 80
-  selector:
-    app: applicants
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: jobs
-  namespace: finalprojet 
-spec:
-  type:  ClusterIP
-  ports:
-  - port: 80
-    targetPort: 80
-  selector:
-    app: jobs
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: identity
-  namespace: finalprojet
-spec:
-  type:  ClusterIP
-  ports:
-  - port: 80
-    targetPort: 80
-  selector:
-    app: identity
+
 ---
 #Ingress Web
 apiVersion: networking.k8s.io/v1
