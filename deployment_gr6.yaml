@@ -41,6 +41,7 @@ spec:
       containers:
       - image: projetgr6.azurecr.io/web:latest
         name: web-container
+        imagePullPolicy: IfNotPresent
         ports:
         - containerPort: 80
           name: webport
@@ -87,6 +88,7 @@ spec:
       containers:
       - image: projetgr6.azurecr.io/applicants.api:latest
         name: applicants-container
+        imagePullPolicy: IfNotPresent
         ports:
         - containerPort: 80
           name: applicantsport
@@ -166,6 +168,7 @@ spec:
       containers:
       - image: projetgr6.azurecr.io/jobs.api:latest
         name: jobs-container
+        imagePullPolicy: IfNotPresent
         ports:
         - containerPort: 80
           name: jobsport
@@ -235,6 +238,7 @@ spec:
       containers:
       - image: projetgr6.azurecr.io/identity.api:latest
         name: identity-container
+        imagePullPolicy: IfNotPresent
         ports:
         - containerPort: 80
           name: identityport
@@ -286,6 +290,7 @@ spec:
       containers:
       - image: projetgr6.azurecr.io/sql.data:latest
         name: sqldata-container
+        imagePullPolicy: IfNotPresent
         ports:
         - containerPort: 1433
           name: sqldataport
@@ -332,6 +337,7 @@ spec:
       containers:
       - image: projetgr6.azurecr.io/redis:latest
         name: userdata-container
+        imagePullPolicy: IfNotPresent
         ports:
         - containerPort: 6379
           name: userdataport
@@ -378,6 +384,7 @@ spec:
       containers:
       - image: projetgr6.azurecr.io/rabbitmq:latest
         name: rabbitmq-container
+        imagePullPolicy: IfNotPresent
         ports:
         - containerPort: 15672
           name: rabbitmqport1
